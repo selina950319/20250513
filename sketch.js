@@ -41,8 +41,11 @@ function draw() {
     for (let i = 0; i < pointIndices.length; i++) {
       const index = pointIndices[i];
       const [x, y] = keypoints[index];
-      vertex(x, y);
+
+      // 將 y 座標往上移 20 像素（你可以自行調整這個數字）
+      vertex(x, y - 20);
     }
     endShape();
   }
 }
+
