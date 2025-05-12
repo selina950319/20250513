@@ -64,6 +64,51 @@ function draw() {
     endShape();
   }
 }
+function draw() {
+  image(video, 0, 0, width, height);
+
+  if (predictions.length > 0) {
+    const keypoints = predictions[0].scaledMesh;
+
+    // 嘴巴自動對齊 (用點13)
+    const faceMouth = keypoints[13];
+    const mouthRefIndex = pointIndices.indexOf(13);
+    if (mouthRefIndex === -1) return;
+
+    const mouthRefPoint = keypoints[pointIndices[mouthRefIndex]];
+    const dx = faceMouth[0] - mouthRefPoint[0];
+    const dy = faceMouth[1] - mouthRefPoint[1];
+
+    // 🎯 畫紅色嘴巴線條
+    stroke(255, 0, 0);
+    strokeWeight(5);
+    noFill();
+    beginShape();
+    for (let i = 0; i < pointIndices.length; i++) {
+      const index = pointIndices[i];
+      const [x, y] = keypoints[index];
+      vertex(x + dx, y + dy);
+    }
+    endShape();
+
+    // 🎯 畫藍色左眼線條（不偏移，直接用臉部特徵位置）
+    const leftEyeIndices = [
+      243, 190, 56, 28, 27, 29, 30, 247, 130, 25, 110, 24, 23, 22, 26,
+      112, 133, 173, 157, 158, 159, 160, 161, 246, 33, 7, 163, 144, 145,
+      153, 154, 155
+    ];
+
+    stroke(0, 0, 255);
+    strokeWeight(5);
+    beginShape();
+    for (let i = 0; i < leftEyeIndices.length; i++) {
+      const index = leftEyeIndices[i];
+      const [x, y] = keypoints[index];
+      vertex(x, y);
+    }
+    endShape();
+  }
+}
 
 
 
