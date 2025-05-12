@@ -33,19 +33,35 @@ function modelReady() {
 function draw() {
   image(video, 0, 0, width, height);
 
-  // 畫人臉點線
   if (predictions.length > 0) {
     const keypoints = predictions[0].scaledMesh;
 
+    // 自動對嘴：
+    // A. 取得真實嘴巴中心（用點 13 和 14）
+    const mouthTop = keypoints[13];
+    const mouthBottom = keypoints[14];
+    const mouthCenter = [
+      (mouthTop[0] + mouthBottom[0]) / 2,
+      (mouthTop[1] + mouthBottom[1]) / 2
+    ];
+
+    // B. 取得你的自訂圖形的嘴巴參考點（例如第 0 號點）
+    const refIndex = 0;
+    const refPoint = keypoints[refIndex];
+
+    // C. 計算平移差距（目標嘴巴位置 - 當前嘴巴位置）
+    const dx = mouthCenter[0] - refPoint[0];
+    const dy = mouthCenter[1] - refPoint[1];
+
+    // D. 畫線，平移整組點
     beginShape();
     for (let i = 0; i < pointIndices.length; i++) {
       const index = pointIndices[i];
       const [x, y] = keypoints[index];
-
-      // 將 y 座標往上移 20 像素（你可以自行調整這個數字）
-      vertex(x, y - 20);
+      vertex(x + dx, y + dy); // 平移
     }
     endShape();
   }
 }
+
 
